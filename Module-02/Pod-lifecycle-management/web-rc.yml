@@ -1,0 +1,47 @@
+# DEMO: Дикий деплой
+# Попробуйте реализовать следующую схему обновления:
+# 1. Примените текущий вариант ReplicationController
+#    kubectl apply -f web-rc.yml
+#    kubectl describe replicationcontroller/web
+#    kubectl get pods -L version
+# 2. Убедитесь, что поды появились
+# 3. Поменяйте версию образа и Label 'version'
+# 4. Выполните команды из пункта 1. Не удивительно, но мы видим два пода со старой версией
+# 5. Увеличьте число реплик до 4 и снова сделайте команды из пункта 1
+# 6. Теперь должно быть 4 пода, по два с каждой версией
+# 7. Снова уменьшите число реплик до 2 и повторите команды из п.1
+# 8. Погрустили, теперь можно изучать Deployment
+# 9. * - Если хочется, попробуйте сделать kubectl rolling-update
+#      (придется немного задержать старт подов через postStart hook и добавить реплик)
+#      В середине апдейта остановите kubectl (e.g. Ctrl-Z) - вы увидите, что деплой встал
+
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: web
+spec:
+  replicas: 2
+  selector:
+    app: web
+  template:
+    metadata:
+      labels:
+        app: web
+        version: v1
+    spec:
+      containers:
+      - name: web
+        image: avtandilko/web:1.0
+        volumeMounts:
+        - name: app
+          mountPath: /app
+      initContainers:
+        - name: html-gen
+          image: busybox:1.31.0
+          command: ['sh', '-c', 'wget -O- https://raw.githubusercontent.com/express42/otus-platform-snippets/master/Module-02/Introduction-to-Kubernetes/wget.sh | sh']
+          volumeMounts:
+            - name: app
+              mountPath: /app
+      volumes:
+        - name: app
+          emptyDir: {}

@@ -1,0 +1,65 @@
+# DEMO:
+# Set-based селекторы проскакивают мимо валидации spec.selector == template.metadata.labels
+# Вот как это работает:
+# 1. Примените манифест
+#     kubectl apply -f web-rs.yml
+# 2. Посмотрите какие поды созданы
+#     kubectl get pods -L environment
+# 3. Теперь попробуйте создать под для другого окружения
+#     kubectl apply -f web-pod-wrong-labels.yml
+# 4. Кажется, контроллер ReplicsSet испортил нам жизнь -
+#    проверьте это командой из п. 2
+# DEMO: старый API в новом свете
+#  В новых версиях API для созданных ReplicaSet нельзя менять
+# поле selector. А в бета-версии - можно.
+#  0. Если вы убили ReplicaSet, снова запустите его
+#  1. Измените метку app в селекторе и шаблоне пода на web_2
+#  2. Примените изменения
+#      kubectl apply -f web-rs.yml
+#      kubectl get pods -L app
+#  3. Вы не сможете этого сделать - увидите ошибку, что поле
+#     selector является неизменяемым
+#  4. Исправьте apiVersion на extensions/v1beta1
+#  5. Повторите команды из п.2
+#  6. Сейчас они должны корректно выполниться, а в кластере будет 4 пода
+#     из них 2 уже не управляются контроллером и живут сами по себе
+#  7. Измените селектор, удалив из него блок matchLabels и добавив
+#     в matchExpression следующую строку:
+#      - {key: app, operator: In, values: [web_1, web_2]}
+#  8. Примените изменения командами и п.2
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: web_1
+    matchExpressions:
+      - {key: tier, operator: In, values: [front]}
+      - {key: environment, operator: NotIn, values: [dev]}
+  template:
+    metadata:
+      labels:
+        app: web_1
+        tier: front
+        environment: test
+    spec:
+      containers:
+      - name: web
+        image: avtandilko/web:2.0
+        volumeMounts:
+        - name: app
+          mountPath: /app
+      initContainers:
+        - name: html-gen
+          image: busybox:1.31.0
+          command: ['sh', '-c', 'wget -O- https://raw.githubusercontent.com/express42/otus-platform-snippets/master/Module-02/Introduction-to-Kubernetes/wget.sh | sh']
+          volumeMounts:
+            - name: app
+              mountPath: /app
+      volumes:
+        - name: app
+          emptyDir: {}

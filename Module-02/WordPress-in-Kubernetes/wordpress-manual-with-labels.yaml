@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: wordpress-v2
+  labels:
+    creation_method: manual
+    env: prod
+spec:
+  containers:
+  - image: wordpress:4.8-apache
+    name: wordpress-frontend
+    ports:
+    - containerPort: 8080
+      protocol: TCP

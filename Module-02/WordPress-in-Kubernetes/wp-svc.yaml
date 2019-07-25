@@ -2,13 +2,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: mysql-wordpress
+  name: wordpress-frontend
   labels:
     app: wordpress
 spec:
   ports:
-    - port: 3306
+    - port: 80
   selector:
     # Note that these match the "labels" in MySQL
     app: wordpress
-    tier: mysql
+    tier: frontend

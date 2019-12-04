@@ -22,7 +22,6 @@ cat <<EOF >> /app/index.html
 <h3>Environment</h3>
 <pre>$INFO_ENV</pre>
 <h3>Memory info</h3>
-This is a test phrase
 <pre>$INFO_RAM</pre>
 <h3>DNS resolvers info</h3>
 <pre>$INFO_RESOLV</pre>

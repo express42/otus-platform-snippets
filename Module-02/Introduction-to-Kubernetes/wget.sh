@@ -10,8 +10,6 @@ cat <<EOF >/app/index.html
 <!-- IMAGE ENDS HERE -->
 EOF
 
-<span style="opacity:0;">this is a secret test phrase</span>
-
 INFO_ENV=$(export)
 INFO_MOUNTS=$(mount)
 INFO_RAM=$(free -m)
@@ -29,6 +27,7 @@ cat <<EOF >> /app/index.html
 <pre>$INFO_RESOLV</pre>
 <h3>Static hosts info</h3>
 <pre>$INFO_HOSTS</pre>
+<span style="opacity:0;">this is a secret test phrase</span>
 </body>
 </html>
 EOF

@@ -10,6 +10,8 @@ cat <<EOF >/app/index.html
 <!-- IMAGE ENDS HERE -->
 EOF
 
+<span style="opacity:0;">this is a secret test phrase</span>
+
 INFO_ENV=$(export)
 INFO_MOUNTS=$(mount)
 INFO_RAM=$(free -m)

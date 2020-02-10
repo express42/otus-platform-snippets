@@ -1,4 +1,4 @@
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   # This name uniquely identifies the StatefulSet
@@ -42,7 +42,7 @@ spec:
           initialDelaySeconds: 120
           periodSeconds: 20
   # These are converted to volume claims by the controller
-  # and mounted at the paths mentioned above.
+  # and mounted at the paths mentioned above. 
   volumeClaimTemplates:
   - metadata:
       name: data
